@@ -1,0 +1,38 @@
+{
+    "name": "rjds/php-dto",
+    "description": "A PHP library to map associative arrays to typed DTOs using attributes.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Rjds\\PhpDto\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rjds\\PhpDto\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ruben Eekhof",
+            "email": "rubeneekhof@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "phpro/grumphp": "^2.19",
+        "phpunit/phpunit": "^13.0",
+        "squizlabs/php_codesniffer": "^4.0",
+        "phpstan/phpstan": "^2.1",
+        "infection/infection": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpro/grumphp": true,
+            "infection/extension-installer": true
+        }
+    }
+}
