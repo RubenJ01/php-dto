@@ -10,10 +10,10 @@ namespace Rjds\PhpDto\Attribute;
  * Supports dot-notation for nested paths (e.g. 'registered.unixtime').
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-final readonly class MapFrom
+final class MapFrom
 {
     public function __construct(
-        public string $key,
+        public readonly string $key,
     ) {
     }
 }

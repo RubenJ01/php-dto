@@ -6,11 +6,11 @@ namespace Rjds\PhpDto\Tests\Fixtures;
 
 use Rjds\PhpDto\Attribute\CastTo;
 
-final readonly class UnsupportedCastDto
+final class UnsupportedCastDto
 {
     public function __construct(
         #[CastTo('xml')]
-        public string $data,
+        public readonly string $data,
     ) {
     }
 }

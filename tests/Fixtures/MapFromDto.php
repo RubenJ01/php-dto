@@ -7,16 +7,16 @@ namespace Rjds\PhpDto\Tests\Fixtures;
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;
 
-final readonly class MapFromDto
+final class MapFromDto
 {
     public function __construct(
         #[MapFrom('first_name')]
-        public string $firstName,
+        public readonly string $firstName,
         #[MapFrom('last_name')]
-        public string $lastName,
+        public readonly string $lastName,
         #[MapFrom('stats.play_count')]
         #[CastTo('int')]
-        public int $playCount,
+        public readonly int $playCount,
     ) {
     }
 }

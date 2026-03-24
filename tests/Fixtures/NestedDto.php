@@ -6,15 +6,15 @@ namespace Rjds\PhpDto\Tests\Fixtures;
 
 use Rjds\PhpDto\Attribute\ArrayOf;
 
-final readonly class NestedDto
+final class NestedDto
 {
     /**
      * @param list<TagDto> $tags
      */
     public function __construct(
-        public string $name,
+        public readonly string $name,
         #[ArrayOf(TagDto::class)]
-        public array $tags,
+        public readonly array $tags,
     ) {
     }
 }

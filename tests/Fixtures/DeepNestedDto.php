@@ -6,12 +6,12 @@ namespace Rjds\PhpDto\Tests\Fixtures;
 
 use Rjds\PhpDto\Attribute\MapFrom;
 
-final readonly class DeepNestedDto
+final class DeepNestedDto
 {
     public function __construct(
-        public string $name,
+        public readonly string $name,
         #[MapFrom('a.b.c')]
-        public string $deep = 'fallback',
+        public readonly string $deep = 'fallback',
     ) {
     }
 }

@@ -9,17 +9,17 @@ use Rjds\PhpDto\Attribute\CastTo;
 /**
  * DTO with mixed-type properties to verify casts produce the correct types.
  */
-final readonly class MixedCastDto
+final class MixedCastDto
 {
     public function __construct(
         #[CastTo('int')]
-        public mixed $count,
+        public readonly mixed $count,
         #[CastTo('float')]
-        public mixed $rating,
+        public readonly mixed $rating,
         #[CastTo('string')]
-        public mixed $label,
+        public readonly mixed $label,
         #[CastTo('bool')]
-        public mixed $active,
+        public readonly mixed $active,
     ) {
     }
 }
