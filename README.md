@@ -1,176 +1,116 @@
 # PHP DTO
 
+![Version](https://img.shields.io/github/v/release/RubenJ01/php-dto?label=version)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/rjds/php-dto)](https://packagist.org/packages/rjds/php-dto)
+[![codecov](https://codecov.io/github/RubenJ01/php-dto/graph/badge.svg)](https://codecov.io/github/RubenJ01/php-dto)
+![License](https://img.shields.io/github/license/RubenJ01/php-dto)
+
 A PHP library to map associative arrays to typed DTOs using attributes.
 
-## Requirements
-
-- PHP >= 8.1
-
 ## Installation
+
+Install from Packagist:
 
 ```bash
 composer require rjds/php-dto
 ```
 
-## Usage
+Requirements:
 
-### Basic mapping
+- PHP 8.1 or higher
 
-Properties are matched by name — no attributes needed when the array keys already match:
+## Overview
+
+`DtoMapper` converts associative arrays to typed constructor-based DTOs.
 
 ```php
+use Rjds\PhpDto\Attribute\ArrayOf;
+use Rjds\PhpDto\Attribute\CastTo;
+use Rjds\PhpDto\Attribute\MapFrom;
 use Rjds\PhpDto\DtoMapper;
 
 final class TagDto
 {
     public function __construct(
-        public string $name,
-        public string $url,
-    ) {}
+        public readonly string $name,
+        public readonly string $url,
+    ) {
+    }
 }
-
-$mapper = new DtoMapper();
-
-$tag = $mapper->map([
-    'name' => 'rock',
-    'url'  => 'https://www.last.fm/tag/rock',
-], TagDto::class);
-
-echo $tag->name; // "rock"
-```
-
-### `#[MapFrom]` — Rename and nest
-
-Map a property from a differently named key, or use dot-notation for nested paths:
-
-```php
-use Rjds\PhpDto\Attribute\MapFrom;
-
-final class UserDto
-{
-    public function __construct(
-        #[MapFrom('first_name')]
-        public string $firstName,
-
-        #[MapFrom('registered.unixtime')]
-        public string $registeredAt,
-    ) {}
-}
-
-$user = $mapper->map([
-    'first_name' => 'Richard',
-    'registered' => ['unixtime' => '1037793040'],
-], UserDto::class);
-
-echo $user->firstName;    // "Richard"
-echo $user->registeredAt; // "1037793040"
-```
-
-### `#[CastTo]` — Type casting
-
-Cast string values (common in JSON APIs) to the correct PHP type:
-
-```php
-use Rjds\PhpDto\Attribute\CastTo;
-
-final class StatsDto
-{
-    public function __construct(
-        #[CastTo('int')]
-        public int $playcount,
-
-        #[CastTo('bool')]
-        public bool $subscriber,
-
-        #[CastTo('datetime')]
-        public \DateTimeImmutable $registered,
-    ) {}
-}
-
-$stats = $mapper->map([
-    'playcount'  => '150316',
-    'subscriber' => '1',
-    'registered' => '1037793040',
-], StatsDto::class);
-
-echo $stats->playcount;                // 150316 (int)
-echo $stats->subscriber ? 'yes' : 'no'; // "yes"
-echo $stats->registered->format('Y');   // "2002"
-```
-
-Supported cast types: `int`, `float`, `string`, `bool`, `datetime`.
-
-- `bool` treats `"1"` and `"true"` (case-insensitive) as `true`, everything else as `false`.
-- `datetime` treats the value as a unix timestamp and returns a `DateTimeImmutable`.
-
-### `#[ArrayOf]` — Nested DTO collections
-
-Map arrays of associative arrays into arrays of DTOs:
-
-```php
-use Rjds\PhpDto\Attribute\ArrayOf;
 
 final class ArtistDto
 {
     /** @param list<TagDto> $tags */
     public function __construct(
-        public string $name,
-
+        public readonly string $name,
+        #[MapFrom('stats.play_count')]
+        #[CastTo('int')]
+        public readonly int $playCount,
         #[ArrayOf(TagDto::class)]
-        public array $tags,
-    ) {}
+        public readonly array $tags,
+    ) {
+    }
 }
+
+$mapper = new DtoMapper();
 
 $artist = $mapper->map([
     'name' => 'Arctic Monkeys',
+    'stats' => ['play_count' => '150316'],
     'tags' => [
         ['name' => 'rock', 'url' => 'https://www.last.fm/tag/rock'],
         ['name' => 'indie', 'url' => 'https://www.last.fm/tag/indie'],
     ],
 ], ArtistDto::class);
 
-echo count($artist->tags);    // 2
-echo $artist->tags[0]->name;  // "rock"
+echo $artist->playCount;   // 150316 (int)
+echo $artist->tags[0]->name; // rock
 ```
 
-### Default values
+## Features
 
-Missing keys fall back to the constructor's default value:
+- Zero-boilerplate name-based mapping for constructor arguments
+- `#[MapFrom]` support for renamed and nested keys using dot notation
+- `#[CastTo]` support for `int`, `float`, `string`, `bool`, and `datetime`
+- `#[ArrayOf]` support for mapping nested DTO collections
+- Constructor default values respected when source keys are missing
+
+## Quick Reference
+
+### `#[MapFrom]`
+
+Map a parameter from a different key, including nested paths:
 
 ```php
-final class ProfileDto
-{
-    public function __construct(
-        public string $name,
-        public string $country = 'Unknown',
-    ) {}
-}
-
-$profile = $mapper->map(['name' => 'RJ'], ProfileDto::class);
-echo $profile->country; // "Unknown"
+#[MapFrom('profile.first_name')]
+public readonly string $firstName
 ```
 
-### Combining attributes
+### `#[CastTo]`
 
-Attributes can be combined freely on a single property:
+Cast scalar string input into strongly typed DTO fields:
 
 ```php
-use Rjds\PhpDto\Attribute\CastTo;
-use Rjds\PhpDto\Attribute\MapFrom;
-
-final class UserDto
-{
-    public function __construct(
-        #[MapFrom('artist_count')]
-        #[CastTo('int')]
-        public int $artistCount,
-    ) {}
-}
+#[CastTo('datetime')]
+public readonly \DateTimeImmutable $registeredAt
 ```
 
-## Compatibility
+### `#[ArrayOf]`
 
-Target compatibility: PHP 8.1+
+Map list entries to nested DTO instances:
+
+```php
+#[ArrayOf(TagDto::class)]
+public readonly array $tags
+```
+
+## Packagist
+
+- Package: [`rjds/php-dto`](https://packagist.org/packages/rjds/php-dto)
+- Source: <https://github.com/RubenJ01/php-dto>
+- Issues: <https://github.com/RubenJ01/php-dto/issues>
+
+The repository includes `name`, `license`, `keywords`, `homepage`, and `support` metadata in `composer.json` for Packagist indexing.
 
 ## Development
 
@@ -185,8 +125,10 @@ Run mutation testing:
 php vendor/bin/infection --threads=4
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for branch strategy, commit conventions, and PR workflow.
 
 ## License
 
-MIT
+This project is released under the MIT License. See [LICENSE](LICENSE) for details and [CHANGELOG.md](CHANGELOG.md) for release history.

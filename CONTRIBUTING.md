@@ -68,3 +68,15 @@
    Woodpecker CI will run phpcs, phpstan, and phpunit on the PR automatically.
 
 8. **Merge with squash merge** on GitHub
+
+## Release checklist (Packagist)
+
+Before creating a release:
+
+1. Ensure `composer validate --strict` passes.
+2. Ensure CI is green on `main`.
+3. Update user-facing docs for any API changes.
+4. Confirm `CHANGELOG.md` contains the upcoming release notes.
+5. Create a semver tag (for example `v1.1.0`) and publish the GitHub release.
+
+Packagist auto-updates when the GitHub repository/tag is updated.
