@@ -104,14 +104,6 @@ Map list entries to nested DTO instances:
 public readonly array $tags
 ```
 
-## Packagist
-
-- Package: [`rjds/php-dto`](https://packagist.org/packages/rjds/php-dto)
-- Source: <https://github.com/RubenJ01/php-dto>
-- Issues: <https://github.com/RubenJ01/php-dto/issues>
-
-The repository includes `name`, `license`, `keywords`, `homepage`, and `support` metadata in `composer.json` for Packagist indexing.
-
 ## Development
 
 ```bash
