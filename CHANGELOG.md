@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/RubenJ01/php-dto/compare/v1.0.0...v1.1.0) (2026-03-24)
+
+
+### Features
+
+* make all code compatible with php 8.1 ([#5](https://github.com/RubenJ01/php-dto/issues/5)) ([7951f7c](https://github.com/RubenJ01/php-dto/commit/7951f7c95b6e5225462fcba7d2c229c8dc51a6b3))
+
 ## 1.0.0 (2026-03-15)
 
 
