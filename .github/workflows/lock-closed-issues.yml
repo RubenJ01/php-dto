@@ -1,0 +1,34 @@
+name: Lock Closed Issues
+
+on:
+    schedule:
+        -   cron: '1 0 * * *'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    lock:
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+        steps:
+            -   name: Harden the runner (Audit all outbound calls)
+                uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+                with:
+                    egress-policy: audit
+
+            -   name: Lock inactive closed issues
+                uses: dessant/lock-threads@7266a7ce5c1df01b1c6db85bf8cd86c737dadbe7 # v6.0.0
+                with:
+                    github-token: ${{ github.token }}
+                    issue-inactive-days: '31'
+                    issue-comment: >
+                        This issue has been automatically locked because there has been no
+                        recent activity since it was closed. Please open a new issue if you
+                        are still encountering a related problem.
+                    issue-lock-reason: resolved
+                    process-only: issues
+
+
