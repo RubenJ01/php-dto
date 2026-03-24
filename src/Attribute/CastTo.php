@@ -13,10 +13,10 @@ namespace Rjds\PhpDto\Attribute;
  * - 'datetime' converts a unix timestamp (int or numeric string) to DateTimeImmutable.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-final readonly class CastTo
+final class CastTo
 {
     public function __construct(
-        public string $type,
+        public readonly string $type,
     ) {
     }
 }

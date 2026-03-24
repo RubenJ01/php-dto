@@ -6,15 +6,15 @@ namespace Rjds\PhpDto\Tests\Fixtures;
 
 use Rjds\PhpDto\Attribute\ArrayOf;
 
-final readonly class NullableArrayOfDto
+final class NullableArrayOfDto
 {
     /**
      * @param list<TagDto>|string|null $tags
      */
     public function __construct(
-        public string $name,
+        public readonly string $name,
         #[ArrayOf(TagDto::class)]
-        public array|string|null $tags = null,
+        public readonly array|string|null $tags = null,
     ) {
     }
 }

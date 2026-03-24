@@ -6,19 +6,19 @@ namespace Rjds\PhpDto\Tests\Fixtures;
 
 use Rjds\PhpDto\Attribute\CastTo;
 
-final readonly class CastDto
+final class CastDto
 {
     public function __construct(
         #[CastTo('int')]
-        public int $age,
+        public readonly int $age,
         #[CastTo('float')]
-        public float $score,
+        public readonly float $score,
         #[CastTo('bool')]
-        public bool $active,
+        public readonly bool $active,
         #[CastTo('string')]
-        public string $label,
+        public readonly string $label,
         #[CastTo('datetime')]
-        public \DateTimeImmutable $createdAt,
+        public readonly \DateTimeImmutable $createdAt,
     ) {
     }
 }

@@ -4,7 +4,7 @@ A PHP library to map associative arrays to typed DTOs using attributes.
 
 ## Requirements
 
-- PHP >= 8.4
+- PHP >= 8.1
 
 ## Installation
 
@@ -21,7 +21,7 @@ Properties are matched by name — no attributes needed when the array keys alre
 ```php
 use Rjds\PhpDto\DtoMapper;
 
-final readonly class TagDto
+final class TagDto
 {
     public function __construct(
         public string $name,
@@ -46,7 +46,7 @@ Map a property from a differently named key, or use dot-notation for nested path
 ```php
 use Rjds\PhpDto\Attribute\MapFrom;
 
-final readonly class UserDto
+final class UserDto
 {
     public function __construct(
         #[MapFrom('first_name')]
@@ -73,7 +73,7 @@ Cast string values (common in JSON APIs) to the correct PHP type:
 ```php
 use Rjds\PhpDto\Attribute\CastTo;
 
-final readonly class StatsDto
+final class StatsDto
 {
     public function __construct(
         #[CastTo('int')]
@@ -110,7 +110,7 @@ Map arrays of associative arrays into arrays of DTOs:
 ```php
 use Rjds\PhpDto\Attribute\ArrayOf;
 
-final readonly class ArtistDto
+final class ArtistDto
 {
     /** @param list<TagDto> $tags */
     public function __construct(
@@ -138,7 +138,7 @@ echo $artist->tags[0]->name;  // "rock"
 Missing keys fall back to the constructor's default value:
 
 ```php
-final readonly class ProfileDto
+final class ProfileDto
 {
     public function __construct(
         public string $name,
@@ -158,7 +158,7 @@ Attributes can be combined freely on a single property:
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;
 
-final readonly class UserDto
+final class UserDto
 {
     public function __construct(
         #[MapFrom('artist_count')]
@@ -170,10 +170,7 @@ final readonly class UserDto
 
 ## Compatibility
 
-Tested against the following PHP versions:
-
-- PHP 8.4
-- PHP 8.5
+Target compatibility: PHP 8.1+
 
 ## Development
 
