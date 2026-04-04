@@ -111,7 +111,8 @@ final class DtoMapper
         /** @var CastTo $castTo */
         $castTo = $attributes[0]->newInstance();
 
-        $dtoClass = $parameter->getDeclaringClass()?->getName() ?? 'unknown';
+        $declaringClass = $parameter->getDeclaringClass();
+        $dtoClass = $declaringClass !== null ? $declaringClass->getName() : 'unknown';
 
         return match ($castTo->type) {
             'int' => (int) $value, // @phpstan-ignore cast.int

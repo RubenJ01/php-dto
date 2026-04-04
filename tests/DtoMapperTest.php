@@ -354,6 +354,23 @@ final class DtoMapperTest extends TestCase
             $this->assertSame('tags', $e->getParameterName());
             $this->assertSame('tags', $e->getMapKey());
             $this->assertSame(0, $e->getArrayIndex());
+            $this->assertStringContainsString('for parameter $tags', $e->getMessage());
+            $this->assertStringContainsString('(mapped from key "tags")', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+    }
+
+    #[Test]
+    public function itUsesSequentialIndicesForArrayOfErrorWhenInputKeysAreNotSequential(): void
+    {
+        try {
+            $this->mapper->map([
+                'name' => 'Test',
+                'tags' => [5 => 'not-an-array'],
+            ], NestedDto::class);
+            $this->fail('Expected MappingException');
+        } catch (MappingException $e) {
+            $this->assertSame(0, $e->getArrayIndex(), 'array_values() normalizes list position for diagnostics');
         }
     }
 

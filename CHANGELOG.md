@@ -1,15 +1,5 @@
 # Changelog
 
-## [Unreleased](https://github.com/RubenJ01/php-dto/compare/v1.1.0...HEAD)
-
-### Features
-
-* add `MappingException` with structured mapping context and optional PHPStan extension for `DtoMapper::map()` return types
-
-### Notes
-
-* Thrown exception types and messages for mapping failures have changed; code that relied on exact `InvalidArgumentException` message text may need updates (catch `MappingException` or match on substrings).
-
 ## [1.1.0](https://github.com/RubenJ01/php-dto/compare/v1.0.0...v1.1.0) (2026-03-24)
 
 
