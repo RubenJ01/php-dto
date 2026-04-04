@@ -7,6 +7,7 @@ namespace Rjds\PhpDto;
 use Rjds\PhpDto\Attribute\ArrayOf;
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;
+use Rjds\PhpDto\Exception\MappingException;
 
 final class DtoMapper
 {
@@ -20,13 +21,22 @@ final class DtoMapper
      */
     public function map(array $data, string $className): object
     {
+        return $this->mapInternal($data, $className);
+    }
+
+    /**
+     * @template T of object
+     * @param array<string, mixed> $data
+     * @param class-string<T> $className
+     * @return T
+     */
+    private function mapInternal(array $data, string $className): object
+    {
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
-            throw new \InvalidArgumentException(
-                sprintf('Class %s must have a constructor.', $className)
-            );
+            throw MappingException::missingConstructor($className);
         }
 
         $args = [];
@@ -51,7 +61,7 @@ final class DtoMapper
             return $parameter->getDefaultValue();
         }
 
-        $value = $this->applyCast($parameter, $value);
+        $value = $this->applyCast($parameter, $value, $key);
         $value = $this->applyArrayOf($parameter, $value);
 
         return $value;
@@ -64,6 +74,7 @@ final class DtoMapper
         if ($attributes !== []) {
             /** @var MapFrom $mapFrom */
             $mapFrom = $attributes[0]->newInstance();
+
             return $mapFrom->key;
         }
 
@@ -89,7 +100,7 @@ final class DtoMapper
         return $current;
     }
 
-    private function applyCast(\ReflectionParameter $parameter, mixed $value): mixed
+    private function applyCast(\ReflectionParameter $parameter, mixed $value, string $mapKey): mixed
     {
         $attributes = $parameter->getAttributes(CastTo::class);
 
@@ -100,6 +111,8 @@ final class DtoMapper
         /** @var CastTo $castTo */
         $castTo = $attributes[0]->newInstance();
 
+        $dtoClass = $parameter->getDeclaringClass()?->getName() ?? 'unknown';
+
         return match ($castTo->type) {
             'int' => (int) $value, // @phpstan-ignore cast.int
             'float' => (float) $value, // @phpstan-ignore cast.double
@@ -108,8 +121,11 @@ final class DtoMapper
                 ? in_array(strtolower($value), ['1', 'true'], true)
                 : (bool) $value,
             'datetime' => (new \DateTimeImmutable())->setTimestamp((int) $value), // @phpstan-ignore cast.int
-            default => throw new \InvalidArgumentException(
-                sprintf('Unsupported cast type "%s".', $castTo->type)
+            default => throw MappingException::unsupportedCast(
+                $dtoClass,
+                $parameter->getName(),
+                $mapKey,
+                $castTo->type,
             ),
         };
     }
@@ -125,14 +141,34 @@ final class DtoMapper
         /** @var ArrayOf $arrayOf */
         $arrayOf = $attributes[0]->newInstance();
 
+        $declaringClass = $parameter->getDeclaringClass();
+        $parentDtoClass = $declaringClass !== null ? $declaringClass->getName() : $parameter->getName();
+        $mapKey = $this->resolveKey($parameter);
+
         $items = [];
         /** @var mixed $item */
-        foreach ($value as $item) {
+        foreach (array_values($value) as $index => $item) {
             if (!is_array($item)) {
-                throw new \InvalidArgumentException('ArrayOf expects each element to be an array.');
+                throw MappingException::arrayOfItemNotArray(
+                    $parentDtoClass,
+                    $parameter->getName(),
+                    $mapKey,
+                    $index,
+                    get_debug_type($item),
+                );
             }
             /** @var array<string, mixed> $item */
-            $items[] = $this->map($item, $arrayOf->className);
+            try {
+                $items[] = $this->mapInternal($item, $arrayOf->className);
+            } catch (MappingException $e) {
+                throw MappingException::nestedWhileMappingArrayOf(
+                    $e,
+                    $parentDtoClass,
+                    $parameter->getName(),
+                    $mapKey,
+                    $index,
+                );
+            }
         }
 
         return $items;
