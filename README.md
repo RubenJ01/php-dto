@@ -74,6 +74,30 @@ echo $artist->tags[0]->name; // rock
 - `#[CastTo]` support for `int`, `float`, `string`, `bool`, and `datetime`
 - `#[ArrayOf]` support for mapping nested DTO collections
 - Constructor default values respected when source keys are missing
+- `MappingException` with structured context (DTO class, parameter, map key, array index, nested `ArrayOf` parent) for easier debugging
+- Optional PHPStan extension to narrow `DtoMapper::map()` return types
+
+## Errors
+
+Mapping failures throw `Rjds\PhpDto\Exception\MappingException` (a subclass of `InvalidArgumentException`). Use `getDtoClass()`, `getParameterName()`, `getMapKey()`, `getArrayIndex()`, and `getParentDtoClass()` to locate problems in large payloads. Failures while mapping an `#[ArrayOf]` element chain the inner exception via `getPrevious()` / `getPreviousMappingException()`.
+
+## Static analysis (PHPStan)
+
+`DtoMapper::map()` is documented with `@template` and `@param class-string<T>` so PHPStan can infer the concrete DTO when you pass a class constant:
+
+```php
+$artist = $mapper->map($data, ArtistDto::class);
+// $artist is inferred as ArtistDto when the second argument is a literal ::class
+```
+
+For clearer results in all setups, include the bundled extension from your `phpstan.neon`:
+
+```neon
+includes:
+    - vendor/rjds/php-dto/phpstan-extension.neon
+```
+
+That extension refines the return type when the second argument is a constant string or a `class-string<SpecificDto>` type.
 
 ## Documentation
 

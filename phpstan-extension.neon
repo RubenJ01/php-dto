@@ -1,0 +1,10 @@
+# Optional include for consumers: narrows DtoMapper::map() return types.
+# In your phpstan.neon:
+#   includes:
+#       - vendor/rjds/php-dto/phpstan-extension.neon
+
+services:
+    -
+        class: Rjds\PhpDto\PHPStan\DtoMapperMapReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

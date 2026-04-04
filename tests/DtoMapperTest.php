@@ -7,6 +7,8 @@ namespace Rjds\PhpDto\Tests;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Rjds\PhpDto\DtoMapper;
+use Rjds\PhpDto\Exception\MappingException;
+use Rjds\PhpDto\Tests\Fixtures\ArrayOfNoCtorParentDto;
 use Rjds\PhpDto\Tests\Fixtures\CastDto;
 use Rjds\PhpDto\Tests\Fixtures\DeepNestedDto;
 use Rjds\PhpDto\Tests\Fixtures\DefaultValueDto;
@@ -218,10 +220,26 @@ final class DtoMapperTest extends TestCase
     #[Test]
     public function itThrowsOnUnsupportedCastType(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(MappingException::class);
         $this->expectExceptionMessage('Unsupported cast type "xml"');
 
         $this->mapper->map(['data' => 'test'], UnsupportedCastDto::class);
+    }
+
+    #[Test]
+    public function itExposesStructuredContextOnUnsupportedCast(): void
+    {
+        try {
+            $this->mapper->map(['data' => 'test'], UnsupportedCastDto::class);
+            $this->fail('Expected MappingException');
+        } catch (MappingException $e) {
+            $this->assertSame(UnsupportedCastDto::class, $e->getDtoClass());
+            $this->assertSame('data', $e->getParameterName());
+            $this->assertSame('data', $e->getMapKey());
+            $this->assertNull($e->getPathSegment());
+            $this->assertNull($e->getArrayIndex());
+            $this->assertNull($e->getParentDtoClass());
+        }
     }
 
     // ── ArrayOf attribute ───────────────────────────────────────────────────
@@ -304,8 +322,8 @@ final class DtoMapperTest extends TestCase
     #[Test]
     public function itThrowsWhenClassHasNoConstructor(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('must have a constructor');
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('a constructor is required');
 
         $this->mapper->map(['key' => 'value'], NoConstructorDto::class);
     }
@@ -313,13 +331,68 @@ final class DtoMapperTest extends TestCase
     #[Test]
     public function itThrowsWhenArrayOfElementIsNotArray(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('ArrayOf expects each element to be an array');
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('got string at index 0');
 
         $this->mapper->map([
             'name' => 'Test',
             'tags' => ['not-an-array'],
         ], NestedDto::class);
+    }
+
+    #[Test]
+    public function itExposesStructuredContextWhenArrayOfElementIsNotArray(): void
+    {
+        try {
+            $this->mapper->map([
+                'name' => 'Test',
+                'tags' => ['not-an-array'],
+            ], NestedDto::class);
+            $this->fail('Expected MappingException');
+        } catch (MappingException $e) {
+            $this->assertSame(NestedDto::class, $e->getDtoClass());
+            $this->assertSame('tags', $e->getParameterName());
+            $this->assertSame('tags', $e->getMapKey());
+            $this->assertSame(0, $e->getArrayIndex());
+            $this->assertStringContainsString('for parameter $tags', $e->getMessage());
+            $this->assertStringContainsString('(mapped from key "tags")', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+    }
+
+    #[Test]
+    public function itUsesSequentialIndicesForArrayOfErrorWhenInputKeysAreNotSequential(): void
+    {
+        try {
+            $this->mapper->map([
+                'name' => 'Test',
+                'tags' => [5 => 'not-an-array'],
+            ], NestedDto::class);
+            $this->fail('Expected MappingException');
+        } catch (MappingException $e) {
+            $this->assertSame(0, $e->getArrayIndex(), 'array_values() normalizes list position for diagnostics');
+        }
+    }
+
+    #[Test]
+    public function itWrapsNestedMappingFailuresWithParentContext(): void
+    {
+        try {
+            $this->mapper->map([
+                'items' => [
+                    [],
+                ],
+            ], ArrayOfNoCtorParentDto::class);
+            $this->fail('Expected MappingException');
+        } catch (MappingException $e) {
+            $this->assertSame(NoConstructorDto::class, $e->getDtoClass());
+            $this->assertSame(ArrayOfNoCtorParentDto::class, $e->getParentDtoClass());
+            $this->assertSame('items', $e->getParameterName());
+            $this->assertSame(0, $e->getArrayIndex());
+            $this->assertSame('items', $e->getMapKey());
+            $this->assertStringContainsString('Nested mapping failed', $e->getMessage());
+            $this->assertInstanceOf(MappingException::class, $e->getPrevious());
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
