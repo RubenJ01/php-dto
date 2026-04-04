@@ -75,6 +75,10 @@ echo $artist->tags[0]->name; // rock
 - `#[ArrayOf]` support for mapping nested DTO collections
 - Constructor default values respected when source keys are missing
 
+## Documentation
+
+Extended usage and attribute details are in the [GitHub Wiki](https://github.com/RubenJ01/php-dto/wiki). The wiki is tracked as a Git submodule at [`wiki/`](wiki/). Clone the library with `git clone --recurse-submodules`, or run `git submodule update --init` after a plain clone. To publish wiki edits, commit inside `wiki/` and run `git push origin master` from that directory (GitHub creates the wiki Git remote when you add the first wiki page in the repository **Wiki** tab, if it is not there yet).
+
 ## Quick Reference
 
 ### `#[MapFrom]`
