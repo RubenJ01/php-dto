@@ -10,7 +10,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Rjds\\PhpDto\\Tests\\": "tests/"
+            "Rjds\\PhpDto\\Tests\\": "tests/",
+            "Rjds\\PhpDto\\PHPStan\\": "dev/phpstan/"
         }
     },
     "authors": [
