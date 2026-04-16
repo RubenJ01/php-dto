@@ -78,7 +78,7 @@ jobs:
 
             -   name: Run backward compatibility check
                 run: |
-                    docker run --rm -v "$GITHUB_WORKSPACE:/app" -w /app nyholm/roave-bc-check:latest roave-backwards-compatibility-check:assert-backwards-compatible --from=origin/${{ github.base_ref || 'main' }} --format=github-actions --config=.roave-backward-compatibility-check.xml
+                    docker run --rm -v "$GITHUB_WORKSPACE:/app" -w /app nyholm/roave-bc-check:latest roave-backwards-compatibility-check:assert-backwards-compatible --from=origin/${{ github.base_ref || 'main' }} --format=github-actions --install-development-dependencies
     coverage:
         runs-on: ubuntu-latest
         needs: test
