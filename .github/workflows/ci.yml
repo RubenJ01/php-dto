@@ -73,9 +73,6 @@ jobs:
             -   name: Install dependencies
                 run: composer install --no-interaction --prefer-dist
 
-            -   name: Fetch base branch
-                run: git fetch origin ${{ github.base_ref }} --depth=1
-
             -   name: Configure git safe directory
                 run: git config --global --add safe.directory /github/workspace
 
