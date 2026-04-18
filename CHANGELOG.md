@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0](https://github.com/RubenJ01/php-dto/compare/v1.1.0...v2.0.0) (2026-04-18)
+
+### ⚠ BREAKING CHANGES
+
+* Mapping failures now throw `Rjds\PhpDto\Exception\MappingException` instead of bare `InvalidArgumentException`. `MappingException` extends `InvalidArgumentException`, so `catch (InvalidArgumentException)` continues to work; strict class checks such as `get_class($e) === InvalidArgumentException::class` may need updating.
+
+### Features
+
+* Add `MappingException` with structured context (DTO class, parameter, map key, array index, nested `ArrayOf` parent)
+* Optional PHPStan extension (`phpstan-extension.neon`) for inferring concrete DTO types from `DtoMapper::map()`
+* Improve `DtoMapper` mapping error behaviour and nested `ArrayOf` error chaining
+
 ## [1.1.0](https://github.com/RubenJ01/php-dto/compare/v1.0.0...v1.1.0) (2026-03-24)
 
 

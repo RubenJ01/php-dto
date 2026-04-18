@@ -38,5 +38,10 @@
             "phpro/grumphp": true,
             "infection/extension-installer": true
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.0.x-dev"
+        }
     }
 }
