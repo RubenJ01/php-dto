@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/RubenJ01/php-dto/compare/v1.1.0...v1.2.0) (2026-04-19)
+
+
+### Features
+
+* add MappingException and PHPStan return-type extension for DtoMapper ([#14](https://github.com/RubenJ01/php-dto/issues/14)) ([1118888](https://github.com/RubenJ01/php-dto/commit/1118888eb3cd556d9331459b7ba77b94ed270a66))
+
 ## [1.1.0](https://github.com/RubenJ01/php-dto/compare/v1.0.0...v1.1.0) (2026-03-24)
 
 
